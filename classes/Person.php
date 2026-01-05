@@ -73,12 +73,4 @@ abstract class Person
     public function setContractId(?int $contractId): void {
         $this->contractId = $contractId;
     }
-
-    protected function savePerson(string $type, string $name, string $email, string $nationality): int
-    {
-        $sql = "INSERT INTO persons (type, name, email, nationality) VALUES (?, ?, ?, ?);";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$type, $name, $email, $nationality]);
-        return (int)$this->pdo->lastInsertId();
-    }
 }

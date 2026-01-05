@@ -24,6 +24,7 @@ class Player extends Person
         $this->role = $role;
         $this->setMarketValue($market_value);
         $this->setSalary($salary);
+        $this->setType();
     }
 
     // ===== GETTERS =====
@@ -55,6 +56,10 @@ class Player extends Person
         return $this->salary;
     }
 
+    public function getType(): string {
+        return $this->type;
+    }
+
     // ===== SETTERS =====
 
     public function setPseudo(string $nickname): void {
@@ -82,21 +87,7 @@ class Player extends Person
         $this->salary = $salary;
     }
 
-
-
-    public function savePlayer(string $name, string $email, string $nationality, string $nickname, string $role, float $market_value): bool
-    {
-        $this->name = $name;
-        $this->email = $email;
-        $this->nationality = $nationality;
-
-        $this->persons_id = $this->savePerson($this->type = "player", $this->name, $this->email, $this->nationality);
-        $this->nickname = $nickname;
-        $this->role = $role;
-        $this->market_value = $market_value;
-
-        $sql = "INSERT INTO players (persons_id, nickname, role, market_value) VALUES (?, ?, ?, ?);";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$this->persons_id, $this->nickname, $this->role, $this->market_value]);
+    public function setType(){
+        $this->type = 'player';
     }
 }
