@@ -1,39 +1,39 @@
 <?php
 require_once __DIR__ . "/../db_connect.php";
 require_once "RepositoryInterface.php";
-require_once "player.php";
+require_once "Coach.php";
 
-class PlayerRepository implements RepositoryInterface
+class CoachRepository implements RepositoryInterface
 {
 
     private PDO $pdo = Database::getInstance()->getConnection();
 
     public function save(object $entity): bool
     {
-        if (!$entity instanceof Player) {
-            throw new InvalidArgumentException("the entity must be instance of Player");
+        if (!$entity instanceof Coach) {
+            throw new InvalidArgumentException("the entity must be instance of Coach");
         }
-        $sql = "INSERT INTO persons (type, name, email, nationality) VALUES (?, ?, ?, ?);";
+        $sql = "INSERT INTO couches (type, name, email, nationality) VALUES (?, ?, ?, ?);";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$entity->getType(), $entity->getName(), $entity->getEmail(), $entity->getNationality()]);
         $persons_id = $this->pdo->lastInsertId();
 
-        $sql = "INSERT INTO players (persons_id, nickname, role, market_value) VALUES (?, ?, ?, ?);";
+        $sql = "INSERT INTO coaches (persons_id, coaching_style, year_of_experience) VALUES (?, ?, ?);";
         $stmt = $this->pdo->prepare($sql);
 
-        return $stmt->execute([$persons_id, $entity->getNickname(), $entity->getRole(), $entity->getMarketValue()]);
+        return $stmt->execute([$persons_id, $entity->getCoachingStyle(), $entity->getYearsExperience()]);
     }
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM players WHERE persons_id = ?";
+        $sql = "DELETE FROM coaches WHERE persons_id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$id]);
     }
 
     public function findById(int $id): ?object
     {
-        $sql = "SELECT * FROM players p JOIN persons P ON p.persons_id = P.id WHERE p.persons_id = ?;";
+        $sql = "SELECT * FROM coaches c JOIN persons P ON c.persons_id = P.id WHERE c.persons_id = ?;";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$id]);
 
@@ -42,12 +42,12 @@ class PlayerRepository implements RepositoryInterface
             return null;
         }
 
-        return new Player($data['name'], $data['email'], $data['nationality'], $data['nickname'], $data['role'], $data['market_value']);
+        return new Coach($data['name'], $data['email'], $data['nationality'], $data['style_coaching'], $data['year_of_experience']);
     }
 
     public function findAll(): array
     {
-        $sql = "SELECT * FROM players JOIN persons ON players.persons_id = persons.id;";
+        $sql = "SELECT * FROM coaches JOIN persons ON coaches.persons_id = persons.id;";
         $stmt = $this->pdo->query($sql);
 
         return $stmt->fetchAll();
@@ -55,11 +55,11 @@ class PlayerRepository implements RepositoryInterface
 
     public function update(object $entity): bool
     {
-        if (!$entity instanceof Player) {
-            throw new InvalidArgumentException("the entity must be instance of Player");
+        if (!$entity instanceof Coach) {
+            throw new InvalidArgumentException("the entity must be instance of Coach");
         }
         $stmt = $this->pdo->prepare(
-            "UPDATE persons
+            "UPDATE coaches
              SET type = ?, name = ?, email = ?, nationality = ?
              WHERE id = ?;"
         );
@@ -72,14 +72,13 @@ class PlayerRepository implements RepositoryInterface
         ]);
 
         $stmt = $this->pdo->prepare(
-            "UPDATE players
-             SET nickname = ?, role = ?, market_value = ?
+            "UPDATE coaches
+             SET style_coaching = ?, year_of_experience = ?
              WHERE persons_id = ?;"
         );
         $stmt->execute([
-            $entity->getNickname(),
-            $entity->getRole(),
-            $entity->getMarketValue(),
+            $entity->getCoachingStyle(),
+            $entity->getYearsExperience(),
             $entity->getId()
         ]);
         return $this->pdo->commit();
