@@ -32,7 +32,7 @@ $Players = $pdo->query("SELECT p.nickname, t.name AS team_name, p.market_value
         </tbody>
     </table>
 </div>
-        <!--i will maeke this is only for admin-->
+<?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'){ ?>
 <div class="card">
     <h3 style="margin-bottom : 1em;">Quick Actions</h3>
     <a href="/views/form_create_player.php" class="btn btn-primary">Add Player</a>
@@ -40,5 +40,6 @@ $Players = $pdo->query("SELECT p.nickname, t.name AS team_name, p.market_value
     <a href="/views/form_create_team.php" class="btn btn-outline">Add Team</a>
     <a href="/views/form_transfer.php" class="btn btn-outline">Make Transfer</a>
 </div>
+<?php }?>
 
 <?php require 'layouts/footer.php'; ?>
