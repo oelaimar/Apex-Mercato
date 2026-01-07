@@ -10,19 +10,27 @@ class Contract {
 
     
     public function __construct(
-        string $uuid,
         int $teamId,
         float $salary,
-        string $startDate,
         string $endDate,
-        ?float $buyoutClause = null
+        ?float $buyoutClause = null,
+        ?string $startDate = null,
+        ?string $uuid = null
     ) {
-        $this->uuid = $uuid;
-        $this->startDate = $startDate;
+        $this->uuid = $uuid ?? $this->generateUuid();
+        $this->startDate = $startDate ?? date('Y-m-d');
         $this->teamId = $teamId;
         $this->setSalary($salary);
         $this->setEndDate($endDate);
         $this->buyoutClause = $buyoutClause;
+    }
+
+    private function generateUuid():string
+    {
+        $data = random_bytes(16);
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
     public function isActive(): bool {
@@ -102,7 +110,7 @@ class Contract {
         return $this->buyoutClause;
     }
     
-    // ===== SETTERS (sauf pour readonly properties) =====
+    // ===== SETTERS =====
     
     public function setId(int $id): void {
         $this->id = $id;
@@ -120,7 +128,6 @@ class Contract {
     }
     
     public function setEndDate(string $endDate): void {
-        // Validation de la date
         $date = DateTime::createFromFormat('Y-m-d', $endDate);
         if (!$date || $date->format('Y-m-d') !== $endDate) {
             throw new InvalidArgumentException("Format de date invalide (attendu: YYYY-MM-DD)");

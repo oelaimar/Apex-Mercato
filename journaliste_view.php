@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/autoload.php';
 require 'auth/auth.php';
 requireRole(['journalist','admin']);
 require 'layouts/header.php';

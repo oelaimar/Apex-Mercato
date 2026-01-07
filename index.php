@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/autoload.php';
 $pdo = Database::getInstance()->getConnection();
 $transfers = $pdo->query("SELECT * FROM transfers")->fetchAll();
 $Players = $pdo->query("SELECT p.nickname, t.name AS team_name, p.market_value

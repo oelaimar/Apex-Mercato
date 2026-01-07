@@ -1,5 +1,5 @@
 <?php
-require_once "person.php";
+
 
 class Player extends Person
 {
@@ -40,7 +40,7 @@ class Player extends Person
         return $stmt->execute([$id]);
     }
 
-    public function getNickname(): string {
+    public function getPseudo(): string {
         return $this->nickname;
     }
     

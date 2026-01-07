@@ -1,5 +1,6 @@
 <?php 
 require 'auth/auth.php';
+require_once __DIR__ . '/autoload.php';
 requirerole('admin');
 require 'layouts/header.php';
 ?>
