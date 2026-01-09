@@ -33,7 +33,7 @@ class Coach extends Person
 
     public function getById(int $id)
     {
-        $sql = "SELECT * FROM coachs JOIN players ON players.persons_id = persons.id WHERE id = ?";
+        $sql = "SELECT * FROM persons JOIN coaches ON coaches.persons_id = persons.id WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([$id]);
     }

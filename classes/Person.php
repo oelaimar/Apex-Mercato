@@ -3,8 +3,7 @@
 
 abstract class Person
 {
-    protected $pdo = Database::getInstance()->getConnection();
-
+    protected $pdo;
     protected int $id;
     protected string $type, $name, $email, $nationality, $create_at;
     private ?int $contractId;
@@ -15,6 +14,7 @@ abstract class Person
         string $nationality,
         ?int $contractId = null
     ) {
+        $this->pdo = Database::getInstance()->getConnection();
         $this->name = $name;
         $this->email = $email;
         $this->nationality = $nationality;
