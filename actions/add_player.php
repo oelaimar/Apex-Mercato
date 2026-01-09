@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . '/../autoload.php';
+require_once __DIR__ . '/../auth/auth.php';
+requireRole('admin');
 
 $pdo = Database::getInstance()->getConnection();
 
@@ -15,29 +17,26 @@ try {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $nationality = trim($_POST['nationality']);
-    $pseudo = trim($_POST['pseudo']);
+    $nickname = trim($_POST['nickname']);
     $role = $_POST['role'];
     $marketValue = (float) $_POST['market_value'];
     
-    // 2. Recueil des données du contrat
     $teamId = (int) $_POST['team_id'];
     $salary = (float) $_POST['salary'];
+    $startDate = $_POST['start_date'];
     $endDate = $_POST['end_date'];
     $buyoutClause = !empty($_POST['buyout_clause']) ? (float) $_POST['buyout_clause'] : null;
 
-    // 3. Création de l'objet Player (pour validation via le constructeur/setters)
-    // Note: contractId est null pour l'instant car non créé
     $player = new Player(
         $name,
         $email,
         $nationality,
-        $pseudo,
+        $nickname,
         $role,
         $marketValue,
         $salary
     );
 
-    // 4. Insertion dans la table 'persons'
     $sqlPerson = "INSERT INTO persons (type, name, email, nationality) 
                   VALUES ('player', :name, :email, :nationality)";
     $stmtPerson = $pdo->prepare($sqlPerson);
@@ -49,7 +48,6 @@ try {
     
     $personId = (int) $pdo->lastInsertId();
 
-    // 5. Insertion dans la table 'players'
     $sqlPlayer = "INSERT INTO players (persons_id, nickname, role, market_value) 
                   VALUES (:persons_id, :nickname, :role, :market_value)";
     $stmtPlayer = $pdo->prepare($sqlPlayer);
@@ -60,15 +58,14 @@ try {
         ':market_value' => $player->getMarketValue()
     ]);
 
-    // 6. Création et insertion du contrat
     $contract = new Contract(
         $teamId,
         $salary,
         $endDate,
-        $buyoutClause
+        $buyoutClause,
+        $startDate
     );
 
-    // Validation du contrat
     if (!$contract->isActive()) {
         throw new Exception("La date de fin du contrat doit être dans le futur");
     }
@@ -88,27 +85,28 @@ try {
 
     $pdo->commit();
     
-    $_SESSION['message'] = "✓ Joueur '{$player->getPseudo()}' créé avec succès au sein de l'équipe!";
+    $_SESSION['message'] = "✓ player '{$player->getPseudo()}' Successfully created!";
     $_SESSION['message_type'] = "success";
+    header('Location: ../admin_dashboard.php');
+    exit;
     
 } catch (InvalidArgumentException $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    $_SESSION['message'] = "❌ Erreur de validation: " . $e->getMessage();
+    $_SESSION['message'] = "❌ Validation failed: " . $e->getMessage();
     $_SESSION['message_type'] = "error";
+    header('Location: ../views/form_create_player.php?error=' . urlencode($e->getMessage()));
+    exit;
 } catch (PDOException $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    if ($e->getCode() == 23000) {
-        $_SESSION['message'] = "❌ Cet email est déjà utilisé ou erreur d'intégrité";
-    } else {
-        $_SESSION['message'] = "❌ Erreur de base de données: " . $e->getMessage();
-    }
+    $errorMsg = ($e->getCode() == 23000) ? "The email address is already registered" : $e->getMessage();
+    $_SESSION['message'] = "❌ " . $errorMsg;
     $_SESSION['message_type'] = "error";
-    error_log("Erreur création joueur: " . $e->getMessage());
+    header('Location: ../views/form_create_player.php?error=' . urlencode($errorMsg));
+    exit;
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    $_SESSION['message'] = "❌ Erreur: " . $e->getMessage();
+    $_SESSION['message'] = "❌ " . $e->getMessage();
     $_SESSION['message_type'] = "error";
+    header('Location: ../views/form_create_player.php?error=' . urlencode($e->getMessage()));
+    exit;
 }
-
-header('Location: ../admin_dashboard.php');
-exit;
