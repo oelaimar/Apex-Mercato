@@ -67,7 +67,7 @@ try {
     );
 
     if (!$contract->isActive()) {
-        throw new Exception("La date de fin du contrat doit être dans le futur");
+        throw new Exception("The contract end date must be a future date.");
     }
 
     $sqlContract = "INSERT INTO contracts (uuid, persons_id, team_id, salary, buyout, end_date)
