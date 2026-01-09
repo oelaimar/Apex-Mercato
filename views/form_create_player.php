@@ -19,7 +19,7 @@ $roles = ['Toplaner', 'Jungler', 'Midlaner', 'ADC', 'Support'];
         <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
     <?php endif; ?>
 
-    <form action="../../actions/add_player.php" method="POST">
+    <form action="../actions/add_player.php" method="POST">
         <div class="grid-2">
             <div class="form-group">
                 <label for="name">Full Name *</label>

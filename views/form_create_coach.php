@@ -2,10 +2,13 @@
 require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../db_connect.php';
 
+// Fetch teams
+$pdo = Database::getInstance()->getConnection();
+$teams = $pdo->query("SELECT * FROM teames ORDER BY name")->fetchAll();
 $styles = ['Aggressive', 'Defensive', 'Supportive', 'Strategic'];
 ?>
 
-<div class="card" style="max-width:700px;margin:auto;">
+<div class="card" style="max-width:900px;margin:auto;">
     <h2>➕ Add New Coach</h2>
 
     <?php if (!empty($_GET['success'])): ?>
@@ -15,7 +18,7 @@ $styles = ['Aggressive', 'Defensive', 'Supportive', 'Strategic'];
         <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
     <?php endif; ?>
 
-    <form action="../../actions/add_coach.php" method="POST">
+    <form action="../actions/add_coach.php" method="POST">
         <div class="grid-2">
             <div class="form-group">
                 <label for="name">Full Name *</label>
@@ -35,8 +38,8 @@ $styles = ['Aggressive', 'Defensive', 'Supportive', 'Strategic'];
             </div>
 
             <div class="form-group">
-                <label for="style">Coaching Style *</label>
-                <select name="style" id="style" class="form-control" required>
+                <label for="style_coaching">Coaching Style *</label>
+                <select name="style_coaching" id="style_coaching" class="form-control" required>
                     <option value="">-- Select Style --</option>
                     <?php foreach ($styles as $style): ?>
                         <option value="<?= $style ?>"><?= $style ?></option>
@@ -45,16 +48,53 @@ $styles = ['Aggressive', 'Defensive', 'Supportive', 'Strategic'];
             </div>
         </div>
 
-        <div class="form-group">
-            <label for="experience">Years of Experience *</label>
-            <input type="number" name="experience" id="experience" class="form-control" min="0" required>
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="years_experience">Years of Experience *</label>
+                <input type="number" name="years_experience" id="years_experience" class="form-control" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="team_id">Team *</label>
+                <select name="team_id" id="team_id" class="form-control" required>
+                    <option value="">-- Select Team --</option>
+                    <?php foreach ($teams as $team): ?>
+                        <option value="<?= $team['id'] ?>"><?= htmlspecialchars($team['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="salary">Monthly Salary (€) *</label>
+                <input type="number" name="salary" id="salary" class="form-control" required min="0" step="100">
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Contract Start Date *</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label for="end_date">Contract End Date *</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="buyout_clause">Buyout Clause (€) - Optional</label>
+                <input type="number" name="buyout_clause" id="buyout_clause" class="form-control" min="0" step="1000">
+            </div>
         </div>
 
         <div style="display:flex;gap:1rem;margin-top:1.5rem;">
             <button type="submit" class="btn btn-success">✓ Create Coach</button>
-            <a href="../../admin_dashboard.php" class="btn btn-danger">✗ Cancel</a>
+            <a href="../admin_dashboard.php" class="btn btn-danger">✗ Cancel</a>
         </div>
     </form>
 </div>
 
 <?php require __DIR__ . '/../layouts/footer.php'; ?>
+

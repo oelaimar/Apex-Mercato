@@ -4,8 +4,14 @@ require_once  __DIR__ . '/../autoload.php';
 
 // Fetch players and teams
 $pdo = Database::getInstance()->getConnection();
-$players = $pdo->query("SELECT id, name, nickname FROM persons INNER JOIN players ON persons.id = players.persons_id ORDER BY nickname")->fetchAll();
+$players = $pdo->query("SELECT p.persons_id as id, ps.name, p.nickname, c.team_id 
+                         FROM players p 
+                         JOIN persons ps ON p.persons_id = ps.id 
+                         LEFT JOIN contracts c ON ps.id = c.persons_id 
+                         ORDER BY p.nickname")->fetchAll();
 $teams = $pdo->query("SELECT * FROM teames ORDER BY name")->fetchAll();
+
+$selectedPlayerId = isset($_GET['player_id']) ? (int)$_GET['player_id'] : null;
 ?>
 
 <div class="card" style="max-width:800px;margin:auto;">
@@ -21,10 +27,14 @@ $teams = $pdo->query("SELECT * FROM teames ORDER BY name")->fetchAll();
     <form action="../../actions/process_transfer.php" method="POST">
         <div class="form-group">
             <label for="player_id">Player *</label>
-            <select name="player_id" id="player_id" class="form-control" required>
+            <select name="player_id" id="player_id" class="form-control" required onchange="updateDepartureTeam()">
                 <option value="">-- Select Player --</option>
                 <?php foreach ($players as $player): ?>
-                    <option value="<?= $player['id'] ?>"><?= htmlspecialchars($player['nickname'] . ' (' . $player['name'] . ')') ?></option>
+                    <option value="<?= $player['id'] ?>" 
+                            data-team-id="<?= $player['team_id'] ?>"
+                            <?= ($selectedPlayerId === (int)$player['id']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars(($player['nickname'] ?: $player['name']) . ' (' . $player['name'] . ')') ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -32,12 +42,13 @@ $teams = $pdo->query("SELECT * FROM teames ORDER BY name")->fetchAll();
         <div class="grid-2">
             <div class="form-group">
                 <label for="departure_team">Departure Team</label>
-                <select name="departure_team" id="departure_team" class="form-control">
+                <select name="departure_team" id="departure_team" class="form-control" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
                     <option value="">-- Select Departure Team --</option>
                     <?php foreach ($teams as $team): ?>
                         <option value="<?= $team['id'] ?>"><?= htmlspecialchars($team['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
+                <small>Auto-filled from current contract</small>
             </div>
 
             <div class="form-group">
@@ -62,5 +73,22 @@ $teams = $pdo->query("SELECT * FROM teames ORDER BY name")->fetchAll();
         </div>
     </form>
 </div>
+
+<script>
+function updateDepartureTeam() {
+    const playerSelect = document.getElementById('player_id');
+    const departureSelect = document.getElementById('departure_team');
+    const selectedOption = playerSelect.options[playerSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.dataset.teamId) {
+        departureSelect.value = selectedOption.dataset.teamId;
+    } else {
+        departureSelect.value = "";
+    }
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', updateDepartureTeam);
+</script>
 
 <?php require  __DIR__ . '/../layouts/footer.php'; ?>

@@ -12,7 +12,7 @@ require_once __DIR__ . '/../layouts/header.php';
         <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
     <?php endif; ?>
 
-    <form action="../../actions/add_team.php" method="POST">
+    <form action="../actions/add_team.php" method="POST">
         <div class="form-group">
             <label for="name">Team Name *</label>
             <input type="text" name="name" id="name" class="form-control" required>
@@ -30,7 +30,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
         <div style="display:flex;gap:1rem;margin-top:1.5rem;">
             <button type="submit" class="btn btn-success">✓ Create Team</button>
-            <a href="../../admin_dashboard.php" class="btn btn-danger">✗ Cancel</a>
+            <a href="../admin_dashboard.php" class="btn btn-danger">✗ Cancel</a>
         </div>
     </form>
 </div>
