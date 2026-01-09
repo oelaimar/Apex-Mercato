@@ -20,7 +20,7 @@ if (isset($USERS[$username]) && $USERS[$username]['password'] === $password) {
         header('Location: ../admin_dashboard.php');
         exit;
     } elseif ($_SESSION['role'] === 'journalist') {
-        header('Location: ../journaliste_view.php');
+        header('Location: ../journalist_view.php');
         exit;
     }
 

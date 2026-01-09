@@ -38,7 +38,6 @@ $Players = $pdo->query("SELECT p.nickname, t.name AS team_name, p.market_value
     <a href="/views/form_create_player.php" class="btn btn-primary">Add Player</a>
     <a href="/views/form_create_coach.php" class="btn btn-outline">Add Coach</a>
     <a href="/views/form_create_team.php" class="btn btn-outline">Add Team</a>
-    <a href="/views/form_transfer.php" class="btn btn-outline">Make Transfer</a>
 </div>
 <?php }?>
 

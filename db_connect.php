@@ -13,7 +13,7 @@ class Database
     private function __construct()
     {
         try{
-            $dataSourceName = "mysql:host={$this->host};dbname={$this->dbname};setcar=utf8mb4";
+            $dataSourceName = "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4";
             $this->pdo = new PDO($dataSourceName, $this->username, $this->password);
             $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         }catch(PDOException $e){

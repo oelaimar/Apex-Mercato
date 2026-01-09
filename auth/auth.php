@@ -1,5 +1,7 @@
 <?php
-session_start();
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
 
 function requireRole(string|array $roles):void{ 
     if(!isset($_SESSION['role'])){
